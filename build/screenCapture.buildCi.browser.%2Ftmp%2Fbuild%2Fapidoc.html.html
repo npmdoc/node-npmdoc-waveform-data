@@ -110,15 +110,6 @@
 
         <li>
 
-            <a class="apidocElementLiA" href="#apidoc.element.waveform-data.toString">
-            function <span class="apidocSignatureSpan">waveform-data.</span>toString
-            <span class="apidocSignatureSpan">()</span>
-            </a>
-
-        </li>
-
-        <li>
-
             <span class="apidocSignatureSpan">object <span class="apidocSignatureSpan">waveform-data.</span>adapters</span>
 
         </li>
@@ -486,7 +477,19 @@
     <li>description and source-code<pre class="apidocCodePre">function WaveformDataAdapter(response_data){
   this.data = response_data;
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+    });
+  });
+
+  describe('.adapter', function(){
+    it("should assign the provided argument as this.data", function(){
+      var data = { foo: 'bar' };
+
+      expect(new WaveformData.<span class="apidocCodeKeywordSpan">adapter</span>(data)).to.have.property('data', data);
+    });
+  });
+});
+...</pre></li>
     </ul>
 
 
@@ -625,21 +628,6 @@ xhr.send();
 
 
 
-    <h2>
-        <a href="#apidoc.element.waveform-data.toString" id="apidoc.element.waveform-data.toString">
-        function <span class="apidocSignatureSpan">waveform-data.</span>toString
-        <span class="apidocSignatureSpan">()</span>
-        </a>
-    </h2>
-    <ul>
-    <li>description and source-code<pre class="apidocCodePre">toString = function () {
-    return text;
-}</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
-    </ul>
-
-
-
 
 
 
@@ -713,7 +701,23 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function fromArrayBufferResponseData(response_data){
   return new WaveformDataArrayBufferAdapter(new DataView(response_data));
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+* xhr.open("GET", "http://example.com/waveforms/track.dat");
+* xhr.responseType = "arraybuffer";
+* xhr.addEventListener("load", function onResponse(progressEvent){
+*  var responseData = progressEvent.target.response;
+*
+*  // doing stuff with the raw data ...
+*  // you only have access to WaveformDataArrayBufferAdapter API
+*  var adapter = arrayBufferAdapter.<span class="apidocCodeKeywordSpan">fromResponseData</span>(responseData);
+*
+*  // or making things easy by using WaveformData ...
+*  // you have access WaveformData API
+*  var waveform = new WaveformData(responseData, arrayBufferAdapter);
+* });
+*
+* xhr.send();
+...</pre></li>
     </ul>
 
 
@@ -728,7 +732,24 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function isCompatible(data){
   return data &amp;&amp; typeof data === "object" &amp;&amp; "byteLength" in data;
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+var xhrData = null;
+
+if (data &amp;&amp; typeof data === "object" &amp;&amp; ("responseText" in data || "response"
+in data)){
+  xhrData = ("responseType" in data) ? data.response : (data.responseText || data.response);
+}
+
+Object.keys(WaveformData.adapters).some(function(adapter_id){
+  if (WaveformData.adapters[adapter_id].<span class="apidocCodeKeywordSpan">isCompatible</span>(xhrData || data)){
+    adapter = WaveformData.adapters[adapter_id];
+    return true;
+  }
+});
+
+if (adapter === null){
+  throw new TypeError("Could not detect a WaveformData adapter from the input.");
+...</pre></li>
     </ul>
 
 
@@ -748,7 +769,23 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function at_sample(index){
   return Math.round(this.data.getInt8(20 + index));
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+offsetValues: function getOffsetValues(start, length, correction){
+  var adapter = this.adapter;
+  var values = [];
+
+  correction += (start * 2);  //offsetting the positioning query
+
+  for (var i = 0; i &lt; length; i++){
+    values.push(adapter.<span class="apidocCodeKeywordSpan">at</span>((i * 2) + correction));
+  }
+
+  return values;
+},
+/**
+ * Compute the duration in seconds of the audio file.
+ *
+...</pre></li>
     </ul>
 
 
@@ -788,7 +825,23 @@ xhr.send();
     return new WaveformDataObjectAdapter(response_data);
   }
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+* xhr.open("GET", "http://example.com/waveforms/track.dat");
+* xhr.responseType = "arraybuffer";
+* xhr.addEventListener("load", function onResponse(progressEvent){
+*  var responseData = progressEvent.target.response;
+*
+*  // doing stuff with the raw data ...
+*  // you only have access to WaveformDataArrayBufferAdapter API
+*  var adapter = arrayBufferAdapter.<span class="apidocCodeKeywordSpan">fromResponseData</span>(responseData);
+*
+*  // or making things easy by using WaveformData ...
+*  // you have access WaveformData API
+*  var waveform = new WaveformData(responseData, arrayBufferAdapter);
+* });
+*
+* xhr.send();
+...</pre></li>
     </ul>
 
 
@@ -804,7 +857,24 @@ xhr.send();
   return data &amp;&amp; (typeof data === "object" &amp;&amp; "sample_rate" in data) || (typeof data === "string" &amp;&amp; "sample_rate" in JSON.parse
 (data));
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+var xhrData = null;
+
+if (data &amp;&amp; typeof data === "object" &amp;&amp; ("responseText" in data || "response"
+in data)){
+  xhrData = ("responseType" in data) ? data.response : (data.responseText || data.response);
+}
+
+Object.keys(WaveformData.adapters).some(function(adapter_id){
+  if (WaveformData.adapters[adapter_id].<span class="apidocCodeKeywordSpan">isCompatible</span>(xhrData || data)){
+    adapter = WaveformData.adapters[adapter_id];
+    return true;
+  }
+});
+
+if (adapter === null){
+  throw new TypeError("Could not detect a WaveformData adapter from the input.");
+...</pre></li>
     </ul>
 
 
@@ -824,7 +894,23 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function at_sample(index){
   return Math.round(this.data.data[index]);
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+offsetValues: function getOffsetValues(start, length, correction){
+  var adapter = this.adapter;
+  var values = [];
+
+  correction += (start * 2);  //offsetting the positioning query
+
+  for (var i = 0; i &lt; length; i++){
+    values.push(adapter.<span class="apidocCodeKeywordSpan">at</span>((i * 2) + correction));
+  }
+
+  return values;
+},
+/**
+ * Compute the duration in seconds of the audio file.
+ *
+...</pre></li>
     </ul>
 
 
@@ -900,7 +986,19 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function WaveformDataAdapter(response_data){
   this.data = response_data;
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+    });
+  });
+
+  describe('.adapter', function(){
+    it("should assign the provided argument as this.data", function(){
+      var data = { foo: 'bar' };
+
+      expect(new WaveformData.<span class="apidocCodeKeywordSpan">adapter</span>(data)).to.have.property('data', data);
+    });
+  });
+});
+...</pre></li>
     </ul>
 
 
@@ -970,7 +1068,23 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function at_sample_proxy(index){
   return this.adapter.at(index);
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+offsetValues: function getOffsetValues(start, length, correction){
+  var adapter = this.adapter;
+  var values = [];
+
+  correction += (start * 2);  //offsetting the positioning query
+
+  for (var i = 0; i &lt; length; i++){
+    values.push(adapter.<span class="apidocCodeKeywordSpan">at</span>((i * 2) + correction));
+  }
+
+  return values;
+},
+/**
+ * Compute the duration in seconds of the audio file.
+ *
+...</pre></li>
     </ul>
 
 
@@ -985,7 +1099,23 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function at_time(time){
   return Math.floor((time * this.adapter.sample_rate) / this.adapter.scale);
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+},
+/**
+ * Return the pixel location for a certain time.
+ *
+ * ```javascript
+ * var waveform = WaveformData.create({ ... });
+ *
+ * console.log(waveform.<span class="apidocCodeKeywordSpan">at_time</span>(0.0000000023));       // -&gt; 10
+ * ```
+ * @param {number} time
+ * @return {integer} Index location for a specific time.
+ */
+at_time: function at_time(time){
+  return Math.floor((time * this.adapter.sample_rate) / this.adapter.scale);
+},
+...</pre></li>
     </ul>
 
 
@@ -1001,16 +1131,21 @@ xhr.send();
   return pixel &gt;= this.offset_start &amp;&amp; pixel &lt; this.offset_end;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-   * waveform.offset(70, 100);
-   * console.log(waveform.points.example.visible);        // -&gt; false
-   * ```
-   *
-   * @return {Boolean} True if visible, false otherwise.
-   */
-  get visible(){
-    return this.context.<span class="apidocCodeKeywordSpan">in_offset</span>(this.timeStamp);
-  }
-};
+},
+/**
+ * Return if a pixel lies within the current offset.
+ *
+ * ```javascript
+ * var waveform = WaveformData.create({ ... });
+ *
+ * console.log(waveform.<span class="apidocCodeKeywordSpan">in_offset</span>(50));      // -&gt; true
+ * console.log(waveform.in_offset(120));     // -&gt; true
+ *
+ * waveform.offset(100, 150);
+ *
+ * console.log(waveform.in_offset(50));      // -&gt; false
+ * console.log(waveform.in_offset(120));     // -&gt; true
+ * ```
 ...</pre></li>
     </ul>
 
@@ -1026,7 +1161,24 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function getMaxValue(offset){
   return this.adapter.at((offset * 2) + 1);
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+var scale = this.adapter.scale;   //scale we are coming from
+var channel_count = 2;
+
+var input_buffer_size = this.adapter.length; //the amount of data we want to resample i.e. final zoom want to resample all data
+but for intermediate zoom we want to resample subset
+var input_index = options.input_index || 0; //is this start point? or is this the index at current scale
+var output_index = options.output_index || 0; //is this end point? or is this the index at scale we want to be?
+var min = input_buffer_size ? this.min_sample(input_index) : 0; //min value for peak in waveform
+var max = input_buffer_size ? this.<span class="apidocCodeKeywordSpan">max_sample</span>(input_index) : 0; //max value for peak
+in waveform
+var min_value = -128;
+var max_value = 127;
+
+if (samples_per_pixel &lt; scale){
+  throw new Error("Zoom level "+samples_per_pixel+" too low, minimum: "+scale);
+}
+...</pre></li>
     </ul>
 
 
@@ -1041,7 +1193,26 @@ xhr.send();
     <li>description and source-code<pre class="apidocCodePre">function getMinValue(offset){
   return this.adapter.at(offset * 2);
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+var samples_per_pixel = options.scale || Math.floor(this.duration * this.adapter.sample_rate / options.width);    //scale we want
+ to reach
+var scale = this.adapter.scale;   //scale we are coming from
+var channel_count = 2;
+
+var input_buffer_size = this.adapter.length; //the amount of data we want to resample i.e. final zoom want to resample all data
+but for intermediate zoom we want to resample subset
+var input_index = options.input_index || 0; //is this start point? or is this the index at current scale
+var output_index = options.output_index || 0; //is this end point? or is this the index at scale we want to be?
+var min = input_buffer_size ? this.<span class="apidocCodeKeywordSpan">min_sample</span>(input_index) : 0; //min value for peak
+in waveform
+var max = input_buffer_size ? this.max_sample(input_index) : 0; //max value for peak in waveform
+var min_value = -128;
+var max_value = 127;
+
+if (samples_per_pixel &lt; scale){
+  throw new Error("Zoom level "+samples_per_pixel+" too low, minimum: "+scale);
+}
+...</pre></li>
     </ul>
 
 
@@ -1081,21 +1252,21 @@ xhr.send();
   this.offset_length = end - start;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
+  * console.log(waveform.points.speakerA.timeStamp);    // -&gt; 30
+  * ```
+  *
+  * @type {Object} A hash of `WaveformDataPoint` objects.
+  */
+ this.points = {};
+
+ this.<span class="apidocCodeKeywordSpan">offset</span>(0, this.adapter.length);
+};
+
+/**
+* Creates an instance of WaveformData by guessing the adapter from the data type.
+* As an icing sugar, it will also do the detection job from an XMLHttpRequest response.
 *
 * ```javascript
-* var waveform = new WaveformData({ ... }, WaveformData.adapters.object);
-* waveform.set_point(10, "example");
-*
-* console.log(waveform.points.example.timeStamp);  // -&gt; 10
-*
-* waveform.<span class="apidocCodeKeywordSpan">offset</span>(20, 50);
-* console.log(waveform.points.example.timeStamp);  // -&gt; 10
-*
-* waveform.offset(70, 100);
-* console.log(waveform.points.example.timeStamp);  // -&gt; 10
-* ```
-* @type {Integer} Time Stamp of the point
-*/
 ...</pre></li>
     </ul>
 
@@ -1121,22 +1292,21 @@ xhr.send();
   return values;
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
- * console.log(waveform.segments.example.min.offset_length); // -&gt; 30
- * console.log(waveform.segments.example.min[0]);            // -&gt; -5
+ * console.log(waveform.min[0]);          // -&gt; -9
  * ```
  *
- * @return {Array.&lt;Integer&gt;} Min values of the segment.
+ * @api
+ * @return {Array.&lt;Integer&gt;} Min values contained in the offset.
  */
 get min(){
-  return this.visible ? this.context.<span class="apidocCodeKeywordSpan">offsetValues</span>(this.offset_start, this.offset_length
-, 0) : [];
+  return this.<span class="apidocCodeKeywordSpan">offsetValues</span>(this.offset_start, this.offset_length, 0);
 },
 /**
- * Return the maximum values for the segment.
+ * Returns all the max peaks values.
  *
  * ```javascript
- * var waveform = new WaveformData({ ... }, WaveformData.adapters.object);
- * waveform.set_segment(10, 50, "example");
+ * var waveform = WaveformData.create({ ... });
+ *
 ...</pre></li>
     </ul>
 
@@ -1154,7 +1324,23 @@ get min(){
     delete this.points[identifier];
   }
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+ * ```javascript
+ * var waveform = WaveformData.create({ ... });
+ *
+ * console.log(Object.keys(waveform.points));          // -&gt; []
+ *
+ * waveform.set_point(30, "speakerA");
+ * console.log(Object.keys(waveform.points));          // -&gt; ['speakerA']
+ * waveform.<span class="apidocCodeKeywordSpan">remove_point</span>("speakerA");
+ * console.log(Object.keys(waveform.points));          // -&gt; []
+ * ```
+ *
+ * @param {String*} identifier Unique identifier. If nothing is specified, *default* will be used as a value.
+ * @return null
+ */
+remove_point: function removePoint(identifier) {
+...</pre></li>
     </ul>
 
 
@@ -1322,21 +1508,21 @@ request.get(`http://api.myapp.com/waveforms/${arvg.wid}.json`)
   return this.points[identifier];
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-* Points are an easy way to keep track bookmarks of the described audio file.
-*
-* They return values based on the actual offset. Which means if you change your offset and:
-*
-* * a point becomes **out of scope**, no data will be returned;
-* * a point is **fully included in the offset**, its whole content will be returned.
-*
-* Points are created with the `WaveformData.<span class="apidocCodeKeywordSpan">set_point</span>(timeStamp, name?)` method.
-*
-* @see WaveformData.prototype.set_point
-* @param {WaveformData} context WaveformData instance
-* @param {Integer} start Initial start index
-* @param {Integer} end Initial end index
-* @constructor
-*/
+ * Defined points.
+ *
+ * ```javascript
+ * var waveform = new WaveformData({ ... }, WaveformData.adapters.object);
+ *
+ * console.log(waveform.points.speakerA);          // -&gt; undefined
+ *
+ * waveform.<span class="apidocCodeKeywordSpan">set_point</span>(30, "speakerA");
+ *
+ * console.log(waveform.points.speakerA.timeStamp);    // -&gt; 30
+ * ```
+ *
+ * @type {Object} A hash of `WaveformDataPoint` objects.
+ */
+this.points = {};
 ...</pre></li>
     </ul>
 
@@ -1359,21 +1545,21 @@ request.get(`http://api.myapp.com/waveforms/${arvg.wid}.json`)
   return this.segments[identifier];
 }</pre></li>
     <li>example usage<pre class="apidocCodePre">...
-*
-* They return values based on the actual offset. Which means if you change your offset and:
-*
-* * a segment becomes **out of scope**, no data will be returned;
-* * a segment is only **partially included in the offset**, only the visible parts will be returned;
-* * a segment is **fully included in the offset**, its whole content will be returned.
-*
-* Segments are created with the `WaveformData.<span class="apidocCodeKeywordSpan">set_segment</span>(from, to, name?)` method.
-*
-* @see WaveformData.prototype.set_segment
-* @param {WaveformData} context WaveformData instance
-* @param {Integer} start Initial start index
-* @param {Integer} end Initial end index
-* @constructor
-*/
+ * Defined segments.
+ *
+ * ```javascript
+ * var waveform = new WaveformData({ ... }, WaveformData.adapters.object);
+ *
+ * console.log(waveform.segments.speakerA);          // -&gt; undefined
+ *
+ * waveform.<span class="apidocCodeKeywordSpan">set_segment</span>(30, 90, "speakerA");
+ *
+ * console.log(waveform.segments.speakerA.start);    // -&gt; 30
+ * ```
+ *
+ * @type {Object} A hash of `WaveformDataSegment` objects.
+ */
+this.segments = {};
 ...</pre></li>
     </ul>
 
@@ -1389,7 +1575,23 @@ request.get(`http://api.myapp.com/waveforms/${arvg.wid}.json`)
     <li>description and source-code<pre class="apidocCodePre">function time(index){
   return index * this.seconds_per_pixel;
 }</pre></li>
-    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    <li>example usage<pre class="apidocCodePre">...
+},
+/**
+ * Returns the time in seconds for a particular index
+ *
+ * ```javascript
+ * var waveform = WaveformData.create({ ... });
+ *
+ * console.log(waveform.<span class="apidocCodeKeywordSpan">time</span>(10));                    // -&gt; 0.0000000023
+ * ```
+ *
+ * @param {Integer} index
+ * @return {number}
+ */
+time: function time(index){
+  return index * this.seconds_per_pixel;
+...</pre></li>
     </ul>
 
 
