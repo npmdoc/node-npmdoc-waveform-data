@@ -1,6 +1,6 @@
 # npmdoc-waveform-data
 
-#### api documentation for  [waveform-data (v2.0.1)](https://github.com/bbc/waveform-data.js)  [![npm package](https://img.shields.io/npm/v/npmdoc-waveform-data.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-waveform-data) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-waveform-data.svg)](https://travis-ci.org/npmdoc/node-npmdoc-waveform-data)
+#### basic api documentation for  [waveform-data (v2.0.1)](https://github.com/bbc/waveform-data.js)  [![npm package](https://img.shields.io/npm/v/npmdoc-waveform-data.svg?style=flat-square)](https://www.npmjs.org/package/npmdoc-waveform-data) [![travis-ci.org build-status](https://api.travis-ci.org/npmdoc/node-npmdoc-waveform-data.svg)](https://travis-ci.org/npmdoc/node-npmdoc-waveform-data)
 
 #### Audio Waveform Data Manipulation API – resample, offset and segment waveform data in JavaScript.
 
@@ -113,7 +113,8 @@
             "android/latest"
         ]
     },
-    "version": "2.0.1"
+    "version": "2.0.1",
+    "bin": {}
 }
 ```
 
